@@ -1,8 +1,8 @@
-"""Page Object for the SauceDemo Inventory / Products page."""
+"""Page Object for the SauceDemo Products page."""
 from playwright.sync_api import Page, expect
 
 
-class InventoryPage:
+class ProductPage:
     SORT_DROPDOWN = "[data-test='product-sort-container']"
     PRODUCT_NAMES = ".inventory_item_name"
     PRODUCT_PRICES = ".inventory_item_price"

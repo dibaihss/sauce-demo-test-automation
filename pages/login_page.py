@@ -27,6 +27,6 @@ class LoginPage:
     def assert_error_message(self, expected_text: str) -> None:
         expect(self._page.locator(self.ERROR_MESSAGE)).to_have_text(expected_text)
 
-    def assert_on_inventory_page(self) -> None:
+    def assert_on_products_page(self) -> None:
         self._page.wait_for_url("**/inventory.html")
         expect(self._page.locator(".title")).to_have_text("Products")

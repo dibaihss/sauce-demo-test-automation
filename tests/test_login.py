@@ -31,13 +31,13 @@ class TestLoginSuccess:
         """standard_user with correct password lands on the Products page."""
         login = LoginPage(page)
         login.login(VALID_USER, VALID_PASS)
-        login.assert_on_inventory_page()
+        login.assert_on_products_page()
 
     def test_page_title_after_login(self, page: Page) -> None:
         """Browser tab still has the SauceDemo title after login."""
         login = LoginPage(page)
         login.login(VALID_USER, VALID_PASS)
-        login.assert_on_inventory_page()
+        login.assert_on_products_page()
         assert "Swag Labs" in page.title()
 
 
@@ -89,7 +89,7 @@ import time  # noqa: E402
     "visual_user",
 ])
 def test_login_completes_within_two_seconds(page: Page, username: str) -> None:
-    """Login must complete and redirect to the inventory page within 2 seconds."""
+    """Login must complete and redirect to the products page within 2 seconds."""
     login = LoginPage(page)
     login.navigate()
 
