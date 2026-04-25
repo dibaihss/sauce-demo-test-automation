@@ -1,6 +1,8 @@
 """Page Objects for the SauceDemo Checkout flow (Step 1, Step 2, Confirmation)."""
 from playwright.sync_api import Page, expect
 
+from pages.sidebar_menu import SidebarMenu
+
 
 class CheckoutStepOnePage:
     FIRST_NAME = "[data-test='firstName']"
@@ -11,6 +13,7 @@ class CheckoutStepOnePage:
 
     def __init__(self, page: Page) -> None:
         self._page = page
+        self.sidebar = SidebarMenu(page)
 
     def fill_customer_info(self, first: str, last: str, postal: str) -> None:
         self._page.fill(self.FIRST_NAME, first)
@@ -32,6 +35,7 @@ class CheckoutStepTwoPage:
 
     def __init__(self, page: Page) -> None:
         self._page = page
+        self.sidebar = SidebarMenu(page)
 
     def finish_order(self) -> None:
         self._page.click(self.FINISH_BUTTON)
@@ -53,6 +57,7 @@ class CheckoutCompletePage:
 
     def __init__(self, page: Page) -> None:
         self._page = page
+        self.sidebar = SidebarMenu(page)
 
     def assert_order_confirmed(self) -> None:
         expect(self._page.locator(self.CONFIRMATION_HEADER)).to_have_text(

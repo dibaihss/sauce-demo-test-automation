@@ -1,6 +1,8 @@
 """Page Object for the SauceDemo Products page."""
 from playwright.sync_api import Page, expect
 
+from pages.sidebar_menu import SidebarMenu
+
 
 class ProductPage:
     SORT_DROPDOWN = "[data-test='product-sort-container']"
@@ -13,6 +15,7 @@ class ProductPage:
 
     def __init__(self, page: Page) -> None:
         self._page = page
+        self.sidebar = SidebarMenu(page)
 
     # --- Actions ---
     def sort_by(self, option_value: str) -> None:
@@ -30,6 +33,10 @@ class ProductPage:
     def go_to_cart(self) -> None:
         self._page.click(self.CART_LINK)
         self._page.wait_for_url("**/cart.html")
+
+    def assert_on_products_page(self) -> None:
+        self._page.wait_for_url("**/inventory.html")
+        expect(self._page.locator(".title")).to_have_text("Products")
 
     # --- Assertions ---
     def assert_product_names_sorted_ascending(self) -> None:

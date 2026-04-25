@@ -27,6 +27,14 @@ class LoginPage:
     def assert_error_message(self, expected_text: str) -> None:
         expect(self._page.locator(self.ERROR_MESSAGE)).to_have_text(expected_text)
 
+    def assert_on_login_page(self) -> None:
+        assert self._page.url == self.URL + "/", (
+            f"Expected login page URL, got {self._page.url}"
+        )
+        expect(self._page.locator(self.USERNAME_INPUT)).to_be_visible()
+        expect(self._page.locator(self.PASSWORD_INPUT)).to_be_visible()
+        expect(self._page.locator(self.LOGIN_BUTTON)).to_be_visible()
+
     def assert_on_products_page(self) -> None:
         self._page.wait_for_url("**/inventory.html")
         expect(self._page.locator(".title")).to_have_text("Products")

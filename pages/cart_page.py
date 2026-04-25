@@ -1,6 +1,8 @@
 """Page Object for the SauceDemo Cart page."""
 from playwright.sync_api import Page, expect
 
+from pages.sidebar_menu import SidebarMenu
+
 
 class CartPage:
     CART_ITEMS = ".cart_item"
@@ -11,6 +13,7 @@ class CartPage:
 
     def __init__(self, page: Page) -> None:
         self._page = page
+        self.sidebar = SidebarMenu(page)
 
     # --- Actions ---
     def proceed_to_checkout(self) -> None:
