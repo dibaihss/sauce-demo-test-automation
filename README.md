@@ -17,16 +17,18 @@ Das Projekt folgt dem **Page Object Model (POM)**, um Selektoren und Aktionen vo
 │       └── regression.yml   # CI-Pipeline (GitHub Actions)
 ├── pages/
 │   ├── login_page.py        # Login-Seite POM
-│   ├── inventory_page.py    # Produktliste POM
+│   ├── product_page.py      # Produktliste POM
 │   ├── cart_page.py         # Warenkorb POM
-│   └── checkout_page.py     # Checkout-Flow POM (Step 1, 2, Complete)
+│   ├── checkout_page.py     # Checkout-Flow POM (Step 1, 2, Complete)
+│   └── sidebar_menu.py      # Gemeinsame Sidebar-Komponente
 ├── tests/
 │   ├── test_login.py        # Authentifizierungs-Tests
-│   ├── test_inventory.py    # Sortierung & Warenkorb-Tests
+│   ├── test_product.py      # Sortierung & Warenkorb-Tests
 │   ├── test_checkout.py     # End-to-End Checkout-Tests
-│   └── test_bugs.py         # Dokumentierte Bugs (problem_user, error_user, performance_glitch_user)
+│   └── test_sidebar.py      # Sidebar-Menü und Navigation
 ├── conftest.py              # Globale Fixtures (Browser, Page, Login-State)
 ├── pytest.ini               # pytest-Konfiguration
+├── report.html              # Beispiel für pytest-html Report
 └── requirements.txt         # Python-Abhängigkeiten
 ```
 
@@ -89,6 +91,11 @@ Der Report wird als `report.html` im Projektverzeichnis gespeichert und kann im 
 python -m pytest tests/test_login.py -v
 ```
 
+### Nur Sidebar-Tests
+```bash
+python -m pytest tests/test_sidebar.py -v
+```
+
 ---
 
 ## Test-Scope
@@ -99,6 +106,7 @@ python -m pytest tests/test_login.py -v
 | **Sortierung** | A→Z, Z→A, Preis aufsteigend, Preis absteigend |
 | **Warenkorb** | Artikel hinzufügen (1 & mehrere), Artikel entfernen, alle Artikel |
 | **Checkout** | Happy Path (1 & 2 Artikel), Validierungsfehler, Navigation nach Bestätigung |
+| **Sidebar** | Menü öffnen/schließen, All Items/Products, Logout, About, Reset App State, Präsenz auf allen authentifizierten Seiten |
 | **Cross-User** | Alle oben genannten Verhaltenstests laufen auch mit `problem_user`, `error_user`, `performance_glitch_user` und `visual_user` |
 
 ---
@@ -118,6 +126,13 @@ Bekannte Fehler sind mit `pytest.mark.xfail` markiert:
 | `xfail` | Test schlägt fehl — dokumentierter Bug |
 | `xpass` | Test besteht obwohl `xfail` — Bug wurde behoben! |
 | `FAILED` | Unerwarteter Fehler — neuer Bug oder Testfehler |
+
+Aktuell dokumentierte Bugs umfassen unter anderem:
+
+- `problem_user`: alle Produktbilder verwenden dieselbe Bildquelle.
+- `problem_user` und `error_user`: Z→A-Sortierung hat keinen Effekt.
+- `error_user`: Checkout kann nicht vollständig abgeschlossen werden.
+- `standard_user`: `Reset App State` leert zwar den Warenkorb, setzt aber den aktuellen `Remove`-Button auf der Produktseite erst nach Reload wieder auf `Add to cart`.
 
 ```bash
 # Nur Cross-User Tests ausführen
