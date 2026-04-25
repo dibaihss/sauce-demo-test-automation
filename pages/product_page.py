@@ -62,3 +62,11 @@ class ProductPage:
 
     def assert_cart_badge_not_visible(self) -> None:
         expect(self._page.locator(self.CART_BADGE)).not_to_be_visible()
+
+    def assert_item_can_be_added(self, item_name: str) -> None:
+        data_test = f"add-to-cart-{item_name.lower().replace(' ', '-')}"
+        expect(self._page.locator(f"[data-test='{data_test}']")).to_be_visible()
+
+    def assert_item_marked_in_cart(self, item_name: str) -> None:
+        data_test = f"remove-{item_name.lower().replace(' ', '-')}"
+        expect(self._page.locator(f"[data-test='{data_test}']")).to_be_visible()

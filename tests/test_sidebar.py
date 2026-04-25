@@ -1,4 +1,6 @@
 """Tests for the shared SauceDemo sidebar menu."""
+import pytest
+
 from playwright.sync_api import Page
 
 from pages.cart_page import CartPage
@@ -80,6 +82,19 @@ class TestSidebarMenu:
         products.sidebar.reset_app_state()
 
         products.assert_cart_badge_not_visible()
+
+    @pytest.mark.xfail(
+        reason="standard_user: Reset App State clears cart state but leaves the current item button as Remove until reload"
+    )
+    def test_reset_app_state_restores_add_to_cart_button(self, logged_in_page: Page) -> None:
+        products = ProductPage(logged_in_page)
+
+        products.add_item_to_cart(SAUCE_LABS_BACKPACK)
+        products.assert_item_marked_in_cart(SAUCE_LABS_BACKPACK)
+
+        products.sidebar.reset_app_state()
+
+        products.assert_item_can_be_added(SAUCE_LABS_BACKPACK)
 
     def test_about_link_navigates_to_saucelabs(self, logged_in_page: Page) -> None:
         products = ProductPage(logged_in_page)
