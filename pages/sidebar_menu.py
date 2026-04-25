@@ -39,6 +39,11 @@ class SidebarMenu:
         self._page.click(self.LOGOUT_LINK)
         self._page.wait_for_url("**/")
 
+    def reset_app_state(self) -> None:
+        self.open()
+        self._page.click(self.RESET_APP_STATE_LINK)
+        self.close()
+
     def assert_on_about_destination(self) -> None:
         assert self._page.url.startswith("https://saucelabs.com"), (
             f"Expected Sauce Labs destination, got {self._page.url}"

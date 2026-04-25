@@ -71,6 +71,16 @@ class TestSidebarMenu:
 
         LoginPage(logged_in_page).assert_on_login_page()
 
+    def test_reset_app_state_clears_cart_badge(self, logged_in_page: Page) -> None:
+        products = ProductPage(logged_in_page)
+
+        products.add_item_to_cart(SAUCE_LABS_BACKPACK)
+        products.assert_cart_badge_count(1)
+
+        products.sidebar.reset_app_state()
+
+        products.assert_cart_badge_not_visible()
+
     def test_about_link_navigates_to_saucelabs(self, logged_in_page: Page) -> None:
         products = ProductPage(logged_in_page)
 
