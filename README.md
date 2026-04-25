@@ -23,7 +23,8 @@ Das Projekt folgt dem **Page Object Model (POM)**, um Selektoren und Aktionen vo
 ├── tests/
 │   ├── test_login.py        # Authentifizierungs-Tests
 │   ├── test_inventory.py    # Sortierung & Warenkorb-Tests
-│   └── test_checkout.py     # End-to-End Checkout-Tests
+│   ├── test_checkout.py     # End-to-End Checkout-Tests
+│   └── test_bugs.py         # Dokumentierte Bugs (problem_user, error_user, performance_glitch_user)
 ├── conftest.py              # Globale Fixtures (Browser, Page, Login-State)
 ├── pytest.ini               # pytest-Konfiguration
 └── requirements.txt         # Python-Abhängigkeiten
@@ -92,13 +93,36 @@ python -m pytest tests/test_login.py -v
 
 ## Test-Scope
 
-| Bereich | Testfälle |
+| **Bereich** | **Testfälle** |
 |---|---|
 | **Login** | Erfolgreicher Login, gesperrter User, falsches Passwort, leere Felder |
 | **Sortierung** | A→Z, Z→A, Preis aufsteigend, Preis absteigend |
 | **Warenkorb** | Artikel hinzufügen (1 & mehrere), Artikel entfernen, alle Artikel |
 | **Checkout** | Happy Path (1 & 2 Artikel), Validierungsfehler, Navigation nach Bestätigung |
-| **Cart-Seite** | Artikel in der Warenkorbansicht entfernen |
+| **Cross-User** | Alle oben genannten Verhaltenstests laufen auch mit `problem_user`, `error_user`, `performance_glitch_user` und `visual_user` |
+
+---
+
+## Cross-User Testing & Bug-Erkennung
+
+SauceDemo stellt verschiedene User-Accounts mit absichtlich eingebauten Fehlern bereit.
+Statt eine separate "Bug-Datei" zu pflegen, laufen die gleichen Verhaltenstests für **alle User**.
+
+Wenn ein Test für `problem_user` fehlschlägt, der für `standard_user` besteht — **das ist der Bug-Fund**.
+
+Bekannte Fehler sind mit `pytest.mark.xfail` markiert:
+
+| Status | Bedeutung |
+|---|---|
+| `PASSED` | Verhalten korrekt |
+| `xfail` | Test schlägt fehl — dokumentierter Bug |
+| `xpass` | Test besteht obwohl `xfail` — Bug wurde behoben! |
+| `FAILED` | Unerwarteter Fehler — neuer Bug oder Testfehler |
+
+```bash
+# Nur Cross-User Tests ausführen
+python -m pytest -k "cross_user or test_each or test_sort_za or test_add_to_cart or test_checkout_completes or test_remove_in_cart or test_login_completes" -v
+```
 
 ---
 

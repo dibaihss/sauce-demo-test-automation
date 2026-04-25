@@ -6,6 +6,7 @@ Covers:
 - Validation error on missing first name
 - Removing an item inside the cart before checkout
 - Back-to-products navigation after order confirmation
+- Cross-user checks: checkout and cart removal tested with all user accounts
 """
 import pytest
 from playwright.sync_api import Page
@@ -144,3 +145,53 @@ class TestCartPage:
         cart.remove_item(SAUCE_LABS_BACKPACK)
         cart.assert_item_not_in_cart(SAUCE_LABS_BACKPACK)
         cart.assert_item_in_cart(SAUCE_LABS_BIKE_LIGHT)
+
+
+# ---------------------------------------------------------------------------
+# Cross-user tests — same behavior expected for every user account
+# ---------------------------------------------------------------------------
+
+CUSTOMER = {"first": "Max", "last": "Mustermann", "postal": "12345"}
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    "performance_glitch_user",
+    pytest.param("error_user", marks=pytest.mark.xfail(
+        reason="error_user: Checkout kann nicht abgeschlossen werden"
+    )),
+    "visual_user",
+])
+def test_checkout_completes_successfully(logged_in_page_as, username: str) -> None:
+    """Full checkout flow must end on the order confirmation page."""
+    page = logged_in_page_as(username)
+    inventory = InventoryPage(page)
+    inventory.add_item_to_cart(SAUCE_LABS_BACKPACK)
+    inventory.go_to_cart()
+
+    CartPage(page).proceed_to_checkout()
+
+    step_one = CheckoutStepOnePage(page)
+    step_one.fill_customer_info(**CUSTOMER)
+    step_one.continue_to_overview()
+
+    CheckoutStepTwoPage(page).finish_order()
+    CheckoutCompletePage(page).assert_order_confirmed()
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    "performance_glitch_user",
+    "error_user",
+    "visual_user",
+])
+def test_remove_in_cart_removes_item(logged_in_page_as, username: str) -> None:
+    """Removing an item in the cart page must make it disappear from the list."""
+    page = logged_in_page_as(username)
+    inventory = InventoryPage(page)
+    inventory.add_item_to_cart(SAUCE_LABS_BACKPACK)
+    inventory.go_to_cart()
+
+    cart = CartPage(page)
+    cart.remove_item(SAUCE_LABS_BACKPACK)
+    cart.assert_item_not_in_cart(SAUCE_LABS_BACKPACK)

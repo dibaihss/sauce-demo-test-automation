@@ -43,3 +43,16 @@ def logged_in_page(page: Page) -> Page:
     page.click("#login-button")
     page.wait_for_url("**/inventory.html")
     return page
+
+
+@pytest.fixture(scope="function")
+def logged_in_page_as(page: Page):
+    """Factory fixture — call with any valid username to get an authenticated page."""
+    def _login(username: str) -> Page:
+        page.goto(BASE_URL)
+        page.fill("#user-name", username)
+        page.fill("#password", "secret_sauce")
+        page.click("#login-button")
+        page.wait_for_url("**/inventory.html")
+        return page
+    return _login

@@ -70,3 +70,34 @@ class TestLoginFailure:
         login = LoginPage(page)
         login.login("", "")
         login.assert_error_message("Epic sadface: Username is required")
+
+
+# ---------------------------------------------------------------------------
+# Cross-user tests
+# ---------------------------------------------------------------------------
+
+import time  # noqa: E402
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    "problem_user",
+    pytest.param("performance_glitch_user", marks=pytest.mark.xfail(
+        reason="performance_glitch_user hat eine künstliche Verzögerung von ~5s"
+    )),
+    "error_user",
+    "visual_user",
+])
+def test_login_completes_within_two_seconds(page: Page, username: str) -> None:
+    """Login must complete and redirect to the inventory page within 2 seconds."""
+    login = LoginPage(page)
+    login.navigate()
+
+    start = time.monotonic()
+    login.login(username, "secret_sauce")
+    page.wait_for_url("**/inventory.html")
+    elapsed = time.monotonic() - start
+
+    assert elapsed < 2.0, (
+        f"Login for {username!r} took {elapsed:.1f}s — expected < 2s"
+    )

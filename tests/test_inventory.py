@@ -6,6 +6,7 @@ Covers:
 - Adding a single item to the cart
 - Adding multiple items to the cart
 - Removing an item from the inventory page
+- Cross-user checks: same behaviors tested with all user accounts
 """
 import pytest
 from playwright.sync_api import Page
@@ -67,3 +68,60 @@ class TestCartManagement:
         while add_buttons.count() > 0:
             add_buttons.first.click()
         inventory.assert_cart_badge_count(count)
+
+
+# ---------------------------------------------------------------------------
+# Cross-user tests — same behavior expected for every user account
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    pytest.param("problem_user", marks=pytest.mark.xfail(
+        reason="problem_user: alle Produktbilder haben dieselbe src"
+    )),
+    "performance_glitch_user",
+    "error_user",
+    "visual_user",
+])
+def test_each_product_has_unique_image(logged_in_page_as, username: str) -> None:
+    """Every product must display its own unique image."""
+    page = logged_in_page_as(username)
+    images = page.locator(".inventory_item img").all()
+    srcs = [img.get_attribute("src") for img in images]
+    assert len(set(srcs)) == len(srcs), (
+        f"Duplicate product images found for {username}: {set(srcs)}"
+    )
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    pytest.param("problem_user", marks=pytest.mark.xfail(
+        reason="problem_user: Z→A Sortierung hat keinen Effekt"
+    )),
+    "performance_glitch_user",
+    pytest.param("error_user", marks=pytest.mark.xfail(
+        reason="error_user: Z→A Sortierung hat keinen Effekt"
+    )),
+    "visual_user",
+])
+def test_sort_za_orders_products_correctly(logged_in_page_as, username: str) -> None:
+    """Selecting Z→A must reorder the product list in descending order."""
+    page = logged_in_page_as(username)
+    inventory = InventoryPage(page)
+    inventory.sort_by("za")
+    inventory.assert_product_names_sorted_descending()
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    "problem_user",
+    "performance_glitch_user",
+    "error_user",
+    "visual_user",
+])
+def test_add_to_cart_updates_badge(logged_in_page_as, username: str) -> None:
+    """Adding an item must increment the cart badge to 1."""
+    page = logged_in_page_as(username)
+    inventory = InventoryPage(page)
+    inventory.add_item_to_cart(SAUCE_LABS_BACKPACK)
+    inventory.assert_cart_badge_count(1)
