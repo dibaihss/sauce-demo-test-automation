@@ -31,6 +31,8 @@ class CheckoutStepOnePage:
 class CheckoutStepTwoPage:
     ITEM_NAMES = ".inventory_item_name"
     ITEM_TOTAL = ".summary_subtotal_label"
+    TAX_TOTAL = ".summary_tax_label"
+    ORDER_TOTAL = ".summary_total_label"
     FINISH_BUTTON = "[data-test='finish']"
 
     def __init__(self, page: Page) -> None:
@@ -47,6 +49,16 @@ class CheckoutStepTwoPage:
     def get_item_total(self) -> float:
         raw = self._page.locator(self.ITEM_TOTAL).text_content()
         # "Item total: $29.99" → 29.99
+        return float(raw.split("$")[1])
+
+    def get_tax_total(self) -> float:
+        raw = self._page.locator(self.TAX_TOTAL).text_content()
+        # "Tax: $2.40" → 2.40
+        return float(raw.split("$")[1])
+
+    def get_order_total(self) -> float:
+        raw = self._page.locator(self.ORDER_TOTAL).text_content()
+        # "Total: $32.39" → 32.39
         return float(raw.split("$")[1])
 
 

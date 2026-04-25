@@ -18,6 +18,8 @@ from pages.checkout_page import CheckoutStepOnePage, CheckoutStepTwoPage, Checko
 
 SAUCE_LABS_BACKPACK = "Sauce Labs Backpack"
 SAUCE_LABS_BIKE_LIGHT = "Sauce Labs Bike Light"
+BACKPACK_PRICE = 29.99
+BIKE_LIGHT_PRICE = 9.99
 
 CUSTOMER = {"first": "Max", "last": "Mustermann", "postal": "12345"}
 
@@ -43,6 +45,9 @@ class TestCheckoutHappyPath:
         # Step 4: Verify overview & finish
         step_two = CheckoutStepTwoPage(logged_in_page)
         step_two.assert_item_listed(SAUCE_LABS_BACKPACK)
+        assert step_two.get_item_total() == BACKPACK_PRICE
+        assert step_two.get_tax_total() == 2.40
+        assert step_two.get_order_total() == 32.39
         step_two.finish_order()
 
         # Step 5: Confirm
@@ -68,6 +73,9 @@ class TestCheckoutHappyPath:
         step_two = CheckoutStepTwoPage(logged_in_page)
         step_two.assert_item_listed(SAUCE_LABS_BACKPACK)
         step_two.assert_item_listed(SAUCE_LABS_BIKE_LIGHT)
+        assert step_two.get_item_total() == BACKPACK_PRICE + BIKE_LIGHT_PRICE
+        assert step_two.get_tax_total() == 3.20
+        assert step_two.get_order_total() == 43.18
         step_two.finish_order()
 
         CheckoutCompletePage(logged_in_page).assert_order_confirmed()

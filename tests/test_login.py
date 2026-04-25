@@ -72,6 +72,22 @@ class TestLoginFailure:
         login.assert_error_message("Epic sadface: Username is required")
 
 
+class TestProtectedRoutes:
+    @pytest.mark.parametrize("route", [
+        "/inventory.html",
+        "/cart.html",
+        "/checkout-step-one.html",
+        "/checkout-step-two.html",
+        "/checkout-complete.html",
+    ])
+    def test_unauthenticated_access_redirects_to_login(self, page: Page, route: str) -> None:
+        login = LoginPage(page)
+
+        page.goto(f"{LoginPage.URL}{route}")
+
+        login.assert_on_login_page()
+
+
 # ---------------------------------------------------------------------------
 # Cross-user tests
 # ---------------------------------------------------------------------------

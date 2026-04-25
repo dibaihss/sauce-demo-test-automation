@@ -20,6 +20,10 @@ class CartPage:
         self._page.click(self.CHECKOUT_BUTTON)
         self._page.wait_for_url("**/checkout-step-one.html")
 
+    def continue_shopping(self) -> None:
+        self._page.click(self.CONTINUE_SHOPPING_BUTTON)
+        self._page.wait_for_url("**/inventory.html")
+
     def remove_item(self, item_name: str) -> None:
         slug = item_name.lower().replace(" ", "-")
         self._page.click(self.REMOVE_BUTTON_TPL.format(slug=slug))

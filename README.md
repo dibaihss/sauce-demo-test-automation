@@ -2,8 +2,6 @@
 
 Automatisierte Regressionstests für [saucedemo.com](https://www.saucedemo.com) mit **Python**, **Playwright** und **pytest**.
 
-![CI](https://github.com/<YOUR_USERNAME>/saucedemo-tests/actions/workflows/regression.yml/badge.svg)
-
 ---
 
 ## Architektur
@@ -107,14 +105,14 @@ python -m pytest tests/test_sidebar.py -v
 | **Warenkorb** | Artikel hinzufügen (1 & mehrere), Artikel entfernen, alle Artikel |
 | **Checkout** | Happy Path (1 & 2 Artikel), Validierungsfehler, Navigation nach Bestätigung |
 | **Sidebar** | Menü öffnen/schließen, All Items/Products, Logout, About, Reset App State, Präsenz auf allen authentifizierten Seiten |
-| **Cross-User** | Alle oben genannten Verhaltenstests laufen auch mit `problem_user`, `error_user`, `performance_glitch_user` und `visual_user` |
+| **Cross-User** | Ausgewählte Regressionen laufen zusätzlich mit `problem_user`, `error_user`, `performance_glitch_user` und `visual_user`: Login-Dauer, eindeutige Produktbilder, Z→A-Sortierung, Badge nach Add-to-Cart, Checkout-Abschluss und Entfernen im Warenkorb |
 
 ---
 
 ## Cross-User Testing & Bug-Erkennung
 
 SauceDemo stellt verschiedene User-Accounts mit absichtlich eingebauten Fehlern bereit.
-Statt eine separate "Bug-Datei" zu pflegen, laufen die gleichen Verhaltenstests für **alle User**.
+Statt eine separate "Bug-Datei" zu pflegen, laufen ausgewählte Regressionen gezielt für mehrere User-Typen.
 
 Wenn ein Test für `problem_user` fehlschlägt, der für `standard_user` besteht — **das ist der Bug-Fund**.
 

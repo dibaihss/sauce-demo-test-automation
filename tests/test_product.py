@@ -11,6 +11,7 @@ Covers:
 import pytest
 from playwright.sync_api import Page
 
+from pages.cart_page import CartPage
 from pages.product_page import ProductPage
 
 
@@ -68,6 +69,17 @@ class TestCartManagement:
         while add_buttons.count() > 0:
             add_buttons.first.click()
         products.assert_cart_badge_count(count)
+
+    def test_continue_shopping_returns_to_products(self, logged_in_page: Page) -> None:
+        products = ProductPage(logged_in_page)
+        products.add_item_to_cart(SAUCE_LABS_BACKPACK)
+        products.go_to_cart()
+
+        cart = CartPage(logged_in_page)
+        cart.continue_shopping()
+
+        products.assert_on_products_page()
+        products.assert_cart_badge_count(1)
 
 
 # ---------------------------------------------------------------------------
