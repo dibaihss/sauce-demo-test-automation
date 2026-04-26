@@ -203,3 +203,21 @@ def test_remove_in_cart_removes_item(logged_in_page_as, username: str) -> None:
     cart = CartPage(page)
     cart.remove_item(SAUCE_LABS_BACKPACK)
     cart.assert_item_not_in_cart(SAUCE_LABS_BACKPACK)
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    "performance_glitch_user",
+    "error_user",
+    pytest.param("visual_user", marks=pytest.mark.xfail(
+        reason="visual_user: checkout button is misplaced and no longer stays in the cart footer"
+    )),
+])
+def test_checkout_button_stays_in_cart_footer(logged_in_page_as, username: str) -> None:
+    """Checkout button must remain inside the cart footer below the cart items."""
+    page = logged_in_page_as(username)
+    products = ProductPage(page)
+    products.add_item_to_cart(SAUCE_LABS_BACKPACK)
+    products.go_to_cart()
+
+    CartPage(page).assert_checkout_button_stays_in_cart_footer()

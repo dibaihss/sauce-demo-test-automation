@@ -83,6 +83,7 @@ python -m pytest --headless -v
 python -m pytest --headless --html=report.html --self-contained-html -v
 ```
 Der Report wird als `report.html` im Projektverzeichnis gespeichert und kann im Browser geöffnet werden.
+Screenshots fuer `FAILED`- und `XFAIL`-Ergebnisse werden automatisch unter `artifacts/screenshots/` abgelegt.
 
 ### Nur eine Testdatei
 ```bash
@@ -105,7 +106,7 @@ python -m pytest tests/test_sidebar.py -v
 | **Warenkorb** | Artikel hinzufügen (1 & mehrere), Artikel entfernen, alle Artikel |
 | **Checkout** | Happy Path (1 & 2 Artikel), Validierungsfehler, Navigation nach Bestätigung |
 | **Sidebar** | Menü öffnen/schließen, All Items/Products, Logout, About, Reset App State, Präsenz auf allen authentifizierten Seiten |
-| **Cross-User** | Ausgewählte Regressionen laufen zusätzlich mit `problem_user`, `error_user`, `performance_glitch_user` und `visual_user`: Login-Dauer, eindeutige Produktbilder, Z→A-Sortierung, Badge nach Add-to-Cart, Checkout-Abschluss und Entfernen im Warenkorb |
+| **Cross-User** | Ausgewählte Regressionen laufen zusätzlich mit `problem_user`, `error_user`, `performance_glitch_user` und `visual_user`: Login-Dauer, eindeutige Produktbilder, Z→A-Sortierung, Badge nach Add-to-Cart, visuelle Header-/Preisleisten-Checks, Katalogpreise auf der Produktseite, Checkout-Abschluss, Checkout-Button-Position im Warenkorb und Entfernen im Warenkorb |
 
 ---
 
@@ -130,11 +131,17 @@ Aktuell dokumentierte Bugs umfassen unter anderem:
 - `problem_user`: alle Produktbilder verwenden dieselbe Bildquelle.
 - `problem_user` und `error_user`: Z→A-Sortierung hat keinen Effekt.
 - `error_user`: Checkout kann nicht vollständig abgeschlossen werden.
+- `visual_user`: Warenkorb-Symbol ist im Header verschoben und bleibt nicht sauber oben rechts.
+- `visual_user`: Zwischen Preis und Add-to-cart-Button entsteht auf Produktkarten zu viel Abstand.
+- `visual_user`: Produktpreise auf der Produktseite weichen vom Standardkatalog ab.
+- `visual_user`: Checkout-Button ist im Warenkorb visuell fehlplatziert und bleibt nicht im Footer-Bereich.
 - `standard_user`: `Reset App State` leert zwar den Warenkorb, setzt aber den aktuellen `Remove`-Button auf der Produktseite erst nach Reload wieder auf `Add to cart`.
+
+Bei `FAILED` und dokumentierten `XFAIL`-Ergebnissen wird automatisch ein Full-Page-Screenshot unter `artifacts/screenshots/` gespeichert. Das erleichtert die visuelle Analyse der absichtlich fehlerhaften User-Typen.
 
 ```bash
 # Nur Cross-User Tests ausführen
-python -m pytest -k "cross_user or test_each or test_sort_za or test_add_to_cart or test_checkout_completes or test_remove_in_cart or test_login_completes" -v
+python -m pytest -k "cross_user or test_each or test_sort_za or test_add_to_cart or test_product_prices or test_cart_icon or test_price_and_button or test_checkout_completes or test_checkout_button or test_remove_in_cart or test_login_completes" -v
 ```
 
 ---

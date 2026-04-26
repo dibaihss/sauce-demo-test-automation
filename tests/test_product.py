@@ -17,6 +17,7 @@ from pages.product_page import ProductPage
 
 SAUCE_LABS_BACKPACK = "Sauce Labs Backpack"
 SAUCE_LABS_BIKE_LIGHT = "Sauce Labs Bike Light"
+CATALOG_PRICES = [29.99, 9.99, 15.99, 49.99, 7.99, 15.99]
 
 
 class TestProductSorting:
@@ -137,3 +138,48 @@ def test_add_to_cart_updates_badge(logged_in_page_as, username: str) -> None:
     products = ProductPage(page)
     products.add_item_to_cart(SAUCE_LABS_BACKPACK)
     products.assert_cart_badge_count(1)
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    "problem_user",
+    "performance_glitch_user",
+    "error_user",
+    pytest.param("visual_user", marks=pytest.mark.xfail(
+        reason="visual_user: cart icon is misplaced and no longer stays at the top right"
+    )),
+])
+def test_cart_icon_stays_top_right(logged_in_page_as, username: str) -> None:
+    """Cart icon must remain in the top-right area of the header."""
+    page = logged_in_page_as(username)
+    ProductPage(page).assert_cart_icon_is_positioned_top_right()
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    "problem_user",
+    "performance_glitch_user",
+    "error_user",
+    pytest.param("visual_user", marks=pytest.mark.xfail(
+        reason="visual_user: excessive empty space between price and add-to-cart button"
+    )),
+])
+def test_first_product_price_and_button_keep_compact_spacing(logged_in_page_as, username: str) -> None:
+    """Price and add-to-cart button should not have an excessive vertical gap."""
+    page = logged_in_page_as(username)
+    ProductPage(page).assert_first_product_pricebar_has_compact_spacing()
+
+
+@pytest.mark.parametrize("username", [
+    "standard_user",
+    "problem_user",
+    "performance_glitch_user",
+    "error_user",
+    pytest.param("visual_user", marks=pytest.mark.xfail(
+        reason="visual_user: product prices differ from the standard catalog on the products page"
+    )),
+])
+def test_product_prices_match_standard_catalog(logged_in_page_as, username: str) -> None:
+    """The visible product prices must match the standard SauceDemo catalog."""
+    page = logged_in_page_as(username)
+    ProductPage(page).assert_catalog_prices(CATALOG_PRICES)

@@ -1,8 +1,12 @@
+import re
+from pathlib import Path
+
 import pytest
 from playwright.sync_api import sync_playwright, Browser, Page
 
 
 BASE_URL = "https://www.saucedemo.com"
+SCREENSHOT_DIR = Path(__file__).parent / "artifacts" / "screenshots"
 
 
 def pytest_addoption(parser):
@@ -56,3 +60,32 @@ def logged_in_page_as(page: Page):
         page.wait_for_url("**/inventory.html")
         return page
     return _login
+
+
+def _sanitize_node_id(nodeid: str) -> str:
+    return re.sub(r"[^A-Za-z0-9._-]+", "_", nodeid).strip("_")
+
+
+def _capture_screenshot(item: pytest.Item, report: pytest.TestReport, outcome: str) -> None:
+    page = item.funcargs.get("page")
+    if page is None or page.is_closed():
+        return
+
+    SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
+    file_name = f"{_sanitize_node_id(item.nodeid)}__{report.when}__{outcome}.png"
+    screenshot_path = SCREENSHOT_DIR / file_name
+    page.screenshot(path=str(screenshot_path), full_page=True)
+    report.sections.append(("screenshot", f"Saved screenshot: {screenshot_path}"))
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo[None]):
+    outcome = yield
+    report = outcome.get_result()
+
+    if report.failed:
+        _capture_screenshot(item, report, "failed")
+        return
+
+    if report.skipped and getattr(report, "wasxfail", None):
+        _capture_screenshot(item, report, "xfail")
