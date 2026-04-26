@@ -51,7 +51,7 @@ Das Projekt folgt dem **Page Object Model (POM)**, um Selektoren und Aktionen vo
 
 ```bash
 # 1. Repository klonen
-git clone https://github.com/<YOUR_USERNAME>/saucedemo-tests.git
+git clone https://github.com/dibaihss/saucedemo-tests.git
 cd saucedemo-tests
 
 # 2. Abhängigkeiten installieren
